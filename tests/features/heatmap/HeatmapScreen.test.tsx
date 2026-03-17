@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -131,5 +131,21 @@ describe('HeatmapScreen', () => {
     expect(screen.getByText(/今日优先键位由最近弱项和日期动态生成/)).toBeInTheDocument()
     expect(screen.getByTestId('trend-chart')).toBeInTheDocument()
     expect(screen.getByText(/建议手指/)).toBeInTheDocument()
+  })
+
+  it('renders the keyboard in its own section and groups the four insight cards below it', () => {
+    render(<HeatmapScreen {...createHeatmapProps()} />)
+
+    const keyboardSection = screen.getByTestId('heatmap-keyboard-section')
+    const insightsGrid = screen.getByTestId('heatmap-insights-grid')
+
+    expect(
+      keyboardSection.compareDocumentPosition(insightsGrid) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+
+    expect(within(insightsGrid).getByTestId('heatmap-card-weakness')).toBeInTheDocument()
+    expect(within(insightsGrid).getByTestId('heatmap-card-recommendations')).toBeInTheDocument()
+    expect(within(insightsGrid).getByTestId('heatmap-card-trend')).toBeInTheDocument()
+    expect(within(insightsGrid).getByTestId('heatmap-card-achievements')).toBeInTheDocument()
   })
 })

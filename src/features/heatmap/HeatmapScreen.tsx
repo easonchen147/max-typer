@@ -101,6 +101,13 @@ export const HeatmapScreen = ({
   const selectedStats = snapshot[selectedKey]
   const selectedStatus = getLetterStatus(selectedStats.level)
   const fingerGuide = getFingerGuide(selectedKey)
+  const weaknessHeadline =
+    recommendations.length > 0
+      ? recommendations
+          .slice(0, 3)
+          .map((letter) => letter.toUpperCase())
+          .join(' / ')
+      : '先完成一轮训练，系统会生成待加强键位'
 
   const trendChart = useMemo(() => buildTrendGeometry(trendPoints), [trendPoints])
 
@@ -204,7 +211,7 @@ export const HeatmapScreen = ({
       </section>
 
       <div className="heatmap-screen__layout">
-        <article className="heatmap-board">
+        <article className="heatmap-board" data-testid="heatmap-keyboard-section">
           <div className="heatmap-board__header">
             <div>
               <p className="eyebrow">键盘地图</p>
@@ -229,19 +236,24 @@ export const HeatmapScreen = ({
           />
         </article>
 
-        <aside className="heatmap-sidebar">
-          <section className="detail-card detail-card--emphasis">
-            <p className="eyebrow">字母 {selectedKey.toUpperCase()}</p>
-            <h3>{selectedStatus}</h3>
+        <div className="heatmap-insights-grid" data-testid="heatmap-insights-grid">
+          <section
+            className="detail-card detail-card--emphasis"
+            data-testid="heatmap-card-weakness"
+          >
+            <p className="eyebrow">待加强</p>
+            <h3>{weaknessHeadline}</h3>
             <p>
-              命中率 {Math.round(selectedStats.accuracy * 100)}%，平均反应{' '}
-              {Math.round(selectedStats.averageReactionMs)}ms。
+              当前查看 {selectedKey.toUpperCase()}：命中率 {Math.round(selectedStats.accuracy * 100)}
+              %，平均反应 {Math.round(selectedStats.averageReactionMs)}ms。
             </p>
 
             <div className="detail-card__stat-grid">
               <div>
-                <span>等级</span>
-                <strong>L{selectedStats.level}</strong>
+                <span>当前状态</span>
+                <strong>
+                  L{selectedStats.level} · {selectedStatus}
+                </strong>
               </div>
               <div>
                 <span>最佳连击</span>
@@ -279,7 +291,7 @@ export const HeatmapScreen = ({
             </button>
           </section>
 
-          <section className="detail-card">
+          <section className="detail-card" data-testid="heatmap-card-recommendations">
             <p className="eyebrow">推荐加强</p>
             <p>把最慢、最不稳的键位按顺序拉回训练主循环。</p>
             <div className="focus-drill-list">
@@ -297,7 +309,7 @@ export const HeatmapScreen = ({
             </div>
           </section>
 
-          <section className="detail-card">
+          <section className="detail-card" data-testid="heatmap-card-trend">
             <p className="eyebrow">最近趋势</p>
             <div className="trend-chart" data-testid="trend-chart">
               <svg
@@ -329,7 +341,7 @@ export const HeatmapScreen = ({
             </div>
           </section>
 
-          <section className="detail-card">
+          <section className="detail-card" data-testid="heatmap-card-achievements">
             <p className="eyebrow">已获成就</p>
             {achievements.length > 0 ? (
               <ul className="achievement-list">
@@ -341,7 +353,7 @@ export const HeatmapScreen = ({
               <p>完成更多训练后，这里会开始记录你的阶段里程碑。</p>
             )}
           </section>
-        </aside>
+        </div>
       </div>
     </section>
   )
